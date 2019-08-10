@@ -439,7 +439,7 @@ cdef class Line:
         unicode _text
         list _bboxes
         CompactList _fonts
-        
+        list _words
         
     def __cinit__(self, Block block):
         self.line = block.curr_line
@@ -452,6 +452,7 @@ cdef class Line:
         self.y2 = 0
         self._bboxes=[]
         self._fonts=CompactList()
+        self._words=[]
         self._get_text()
         assert len(self._text) == len(self._bboxes)
            
@@ -512,6 +513,8 @@ cdef class Line:
                 self.x2=bx2
             if by2 > self.y2:
                 self.y2=by2
+            # added words
+            self._words.append((words[-1], (bx1, by1, bx2, by2), (r, g, b)))
             # add space after word if necessary    
             if w.hasSpaceAfter():
                 words.append(u' ')
@@ -536,9 +539,6 @@ cdef class Line:
         def __get__(self):
             return self._fonts
             
-        
-    
-        
-    
-    
-    
+    property words:
+        def __get__(self):
+            return self._words
