@@ -24,52 +24,6 @@ Available under GPL v3 or any later version license (libpoppler is also GPL).
 
 Below or some instructions to install this package
 
-### CentOS 7 - system-wide libpoppler (pkg-config method)
-
-Install the poppler-devel package (Tested with version 0.26.5-16.el7)
-
-    yum install poppler-devel poppler-cpp-devel
-
-Install cython
-    
-    pip install cython
-
-Install the repo
-    
-    pip install git+https://github.com/izderadicka/pdfparser
-
-### CentOS 7 - self compiled method
-
-Clone this repo and enter into the root folder
-
-    cd /git/repos/
-    git clone https://github.com/izderadicka/pdfparser.git
-    cd pdfparser
-
-Clone the poppler repo and install (similar to build_poppler.sh)
-    
-    yum install openjpeg2-devel libjpeg-turbo-devel cmake
-    git clone --depth 1 https://anongit.freedesktop.org/git/poppler/poppler.git poppler_src
-    cd poppler_src
-    cmake -DENABLE_SPLASH=OFF -DENABLE_UTILS=OFF -DENABLE_LIBOPENJPEG=none .
-    make
-    cp libpoppler.so.?? ../pdfparser/
-    cp cpp/libpoppler-cpp.so.? ../pdfparser
-    cd ..
-    POPPLER_ROOT=poppler_src python setup.py install
-    
- 
-### Debian like - self compiled method (with local poppler library)
- 
-```
-git clone --depth 1 https://github.com/izderadicka/pdfparser.git
-cd pdfparser
-./build_poppler.sh
-pip install cython
-POPPLER_ROOT=poppler_src ./setup.py install
-#test that it works
-python tests/dump_file.py test_docs/test1.pdf
-```
 
 ### Debian like -  system wide libpoppler 
 ```
@@ -85,29 +39,6 @@ pip install cython
 pip install git+https://github.com/izderadicka/pdfparser
 ```
 
-## Usage
-
-See `tests/dump_file.py` for available arguments and some basic example.
-```
-usage: dump_file.py [-h] [--char-details] [-f FIRST_PAGE] [-l LAST_PAGE]
-                    [--phys-layout] [--fixed-pitch FIXED_PITCH] [-q]
-                    document
-
-positional arguments:
-  document              Document file
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --char-details        print character details
-  -f FIRST_PAGE, --first-page FIRST_PAGE
-                        first page
-  -l LAST_PAGE, --last-page LAST_PAGE
-                        first page
-  --phys-layout         Physical Layout - param for text analysis
-  --fixed-pitch FIXED_PITCH
-                        Fixed pitch - param for text analysis - app. max space size
-  -q, --quiet           Silence all output from poppler
-```
 
 ## Speed comparisons
 
