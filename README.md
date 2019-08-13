@@ -30,13 +30,13 @@ Below or some instructions to install this package
 sudo apt-get update
 sudo apt-get install -y libpoppler-private-dev libpoppler-cpp-dev
 pip install cython
-pip install git+https://github.com/izderadicka/pdfparser
+pip install git+https://github.com/nghiapq77/pdfparser
 ```
 
 ### Mac OS
 ```
 pip install cython
-pip install git+https://github.com/izderadicka/pdfparser
+pip install git+https://github.com/nghiapq77/pdfparser
 ```
 
 
