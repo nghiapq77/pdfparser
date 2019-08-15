@@ -3,6 +3,8 @@ from libcpp.string cimport string
 from cpython cimport bool as PyBool
 from cpython.object cimport Py_EQ, Py_NE
 
+from libc.stdio cimport printf
+
 ctypedef bool GBool
 DEF PRECISION=1e-6
 
@@ -100,8 +102,8 @@ cdef extern from "TextOutputDev.h":
         
     cdef cppclass TextFontInfo:
         GooString *getFontName() 
-        double getAscent();
-        double getDescent();
+        double getAscent()
+        double getDescent()
 
         GBool isFixedWidth() 
         GBool isSerif() 
@@ -156,8 +158,7 @@ cdef class Document:
         if self._pg >= self.no_of_pages:
             raise StopIteration()
         self._pg+=1
-        return self.get_page(self._pg)
-        
+        return self.get_page(self._pg)  
    
         
 cdef class Page:
@@ -225,15 +226,15 @@ cdef class Block:
     cdef:
         TextBlock *block
         TextLine *curr_line
+
+        list _words
         
     def __cinit__(self, Flow flow):
         self.block= flow.curr_block
         self.curr_line=self.block.getLines()
-        
-#TODO - do we need to delete blocks, lines ... or are they destroyed with page?        
-#     def __dealloc__(self):
-#         if self.block != NULL:
-#             del self.block
+
+        self._words=[]
+        self._get_words()
         
     def __iter__(self):
         return self
@@ -245,12 +246,49 @@ cdef class Block:
         l=Line(self)
         self.curr_line=self.curr_line.getNext()
         return l
+
+    def _get_words(self):
+        cdef:
+            TextWord *w
+            GooString *s
+            double bx1,bx2, by1, by2
+            list words = []
+            double r,g,b
+        
+        line = self.block.getLines()
+        while line:
+            w = line.getWords()
+            while w:
+                wlen=w.getLength()
+                assert wlen>0
+                s = w.getText()
+                IF USE_CSTRING:
+                    s_cstr = s.c_str()
+                ELSE:
+                    s_cstr = s.getCString()
+                words.append(s_cstr.decode('UTF-8')) # decoded to python unicode string
+                del s
+                # must have same ammount of bboxes and characters in word
+                assert len(words[-1]) == wlen
+                #calculate line bbox
+                w.getBBox(&bx1, &by1, &bx2, &by2)
+                # added words
+                self._words.append((words[-1], (bx1, by1, bx2, by2), (r, g, b)))
+                # add space after word if necessary    
+                if w.hasSpaceAfter():
+                    words.append(u' ')
+                w = w.getNext()
+            line = line.getNext()
         
     property bbox:
         def __get__(self):
             cdef double x1,y1,x2,y2
             self.block.getBBox(&x1, &y1, &x2, &y2)
-            return  BBox(x1,y1,x2,y2)
+            return BBox(x1,y1,x2,y2)
+    
+    property words:
+        def __get__(self):
+            return self._words
         
 cdef class BBox:
     cdef double x1, y1, x2, y2
@@ -262,7 +300,7 @@ cdef class BBox:
         self.y2=y2
         
     def as_tuple(self):
-        return self.x1,self.y1, self.x2, self.y2
+        return self.x1, self.y1, self.x2, self.y2
     
     def __getitem__(self, i):
         if i==0:
