@@ -3,8 +3,6 @@ from libcpp.string cimport string
 from cpython cimport bool as PyBool
 from cpython.object cimport Py_EQ, Py_NE
 
-from libc.stdio cimport printf
-
 ctypedef bool GBool
 DEF PRECISION=1e-6
 
@@ -532,7 +530,6 @@ cdef class Line:
                 self._fonts.append(last_font)
             #and then text as UTF-8 bytes
             s=w.getText()
-            #print s.getCString(), w.getLength(), len(s.getCString())
             IF USE_CSTRING:
                 s_cstr = s.c_str()
             ELSE:
