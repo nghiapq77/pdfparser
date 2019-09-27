@@ -108,7 +108,6 @@ cdef extern from "TextOutputDev.h":
         GBool isSymbolic() 
         GBool isItalic() 
         GBool isBold() 
-         
         
        
 cdef double RESOLUTION=72.0
@@ -142,8 +141,8 @@ cdef class Document:
      
     cdef object get_page_size(self, page_no):
             cdef double w,h
-            w=self._doc.getPageMediaWidth(page_no)
-            h= self._doc.getPageMediaHeight(page_no)
+            w = self._doc.getPageMediaWidth(page_no)
+            h = self._doc.getPageMediaHeight(page_no)
             return (w,h)
             
     def __iter__(self):
@@ -268,8 +267,10 @@ cdef class Block:
                 del s
                 # must have same ammount of bboxes and characters in word
                 assert len(words[-1]) == wlen
-                #calculate line bbox
+                # calculate line bbox
                 w.getBBox(&bx1, &by1, &bx2, &by2)
+                # get word color 
+                w.getColor(&r, &g, &b)
                 # added words
                 self._words.append((words[-1], (bx1, by1, bx2, by2), (r, g, b)))
                 # add space after word if necessary    
